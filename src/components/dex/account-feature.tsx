@@ -81,12 +81,12 @@ export function AccountFeature() {
 
       {/* Day 3: Settlement Banner */}
       {settledPositions > 0 && (
-        <Card className="bg-emerald-500/10 border-emerald-500/30">
+        <Card className="bg-long/10 border-long/30">
           <div className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+              <CheckCircle2 className="h-6 w-6 text-long" />
               <div>
-                <p className="font-medium text-emerald-500">Positions Ready to Settle</p>
+                <p className="font-medium text-long">Positions Ready to Settle</p>
                 <p className="text-sm text-muted-foreground">
                   {settledPositions} position{settledPositions > 1 ? 's' : ''} in settled markets - claim your P&L
                 </p>
@@ -94,7 +94,7 @@ export function AccountFeature() {
             </div>
             <Button 
               variant="outline" 
-              className="border-emerald-500/50 text-emerald-500 hover:bg-emerald-500/10"
+              className="border-long/50 text-long hover:bg-long/10"
               onClick={() => {
                 // Scroll to positions tab
                 const positionsTab = document.querySelector('[value="positions"]');
@@ -199,8 +199,8 @@ export function AccountFeature() {
         {/* Day 3: Funding Status */}
         <Card className="trading-panel">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-amber-500/10">
-              <Percent className="h-5 w-5 text-amber-500" />
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Percent className="h-5 w-5 text-primary" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Funding</p>
@@ -241,7 +241,7 @@ export function AccountFeature() {
                     </span>
                   )}
                   {settledPositions > 0 && (
-                    <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-emerald-500/20 text-emerald-500">
+                    <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-long/20 text-long">
                       {settledPositions} to settle
                     </span>
                   )}
@@ -300,7 +300,7 @@ function FundingSection({ positions, settleFunding }: {
     <div className="space-y-4">
       <div className="bg-muted/50 rounded-lg p-4">
         <h4 className="font-medium mb-2 flex items-center gap-2">
-          <AlertTriangle className="h-4 w-4 text-amber-500" />
+          <AlertTriangle className="h-4 w-4 text-primary" />
           About Funding
         </h4>
         <p className="text-sm text-muted-foreground">

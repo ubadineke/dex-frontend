@@ -1,6 +1,6 @@
 "use client";
 
-import { Zap, Github, ExternalLink } from "lucide-react";
+import { Github, ExternalLink } from "lucide-react";
 
 export function AppFooter() {
   return (
@@ -9,12 +9,10 @@ export function AppFooter() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Logo & Description */}
           <div className="flex items-center gap-3">
-            <div className="h-6 w-6 rounded bg-primary flex items-center justify-center">
-              <Zap className="h-4 w-4 text-primary-foreground" />
-            </div>
+            <img src="/logo.png" alt="Moxie" className="h-6 w-6" />
             <span className="text-sm text-muted-foreground">
-              Pred<span className="text-foreground font-medium">Perp</span> DEX
-              - Prediction Market Perpetuals on Solana
+              <span className="gradient-moxie-text font-medium">Moxie</span>
+              {" "}- Prediction Market Perpetuals on Solana
             </span>
           </div>
 
@@ -41,11 +39,6 @@ export function AppFooter() {
           </div>
         </div>
 
-        <div className="mt-6 pt-4 border-t border-border/50 text-center">
-          <p className="text-xs text-muted-foreground">
-            Built on Solana. Use at your own risk. This is experimental software.
-          </p>
-        </div>
       </div>
     </footer>
   );

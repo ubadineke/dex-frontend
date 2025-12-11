@@ -14,12 +14,12 @@ export function TradeFeature() {
   const isSettled = selectedMarket?.info.status === MarketStatus.Settled;
   
   return (
-    <div className="max-w-[1800px] mx-auto h-[calc(100vh-140px)]">
+    <div className="max-w-[1800px] mx-auto lg:h-[calc(100vh-140px)]">
       {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 h-full">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:h-full">
         {/* Left Column - Chart (60%) */}
         <div className="lg:col-span-3 flex flex-col">
-          <Card className="trading-panel flex-1 flex flex-col min-h-[500px]">
+          <Card className="trading-panel flex-1 flex flex-col h-[300px] md:h-[400px] lg:min-h-[500px] lg:h-auto">
             {/* Chart Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="trading-panel-header mb-0 flex items-center gap-2">
@@ -44,18 +44,18 @@ export function TradeFeature() {
         </div>
 
         {/* Right Column - Trading Panel (40%) */}
-        <div className="lg:col-span-2 flex flex-col gap-4 overflow-y-auto max-h-[calc(100vh-140px)]">
+        <div className="lg:col-span-2 flex flex-col gap-4 lg:overflow-y-auto lg:max-h-[calc(100vh-140px)]">
           {/* Market Selector */}
-          <div className="flex items-center justify-between">
+          <div className="w-full">
             <MarketSelector />
           </div>
 
           {/* Day 3: Settlement Warning Banner */}
           {isSettled && (
-            <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
+            <div className="bg-short/10 border border-short/30 rounded-lg p-3">
               <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-amber-500" />
-                <span className="text-sm font-medium text-amber-500">Trading Disabled</span>
+                <Shield className="h-4 w-4 text-short" />
+                <span className="text-sm font-medium text-short">Trading Disabled</span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 This market has settled. Go to Account to settle your positions.
@@ -80,7 +80,7 @@ function SystemStatusBadges() {
     <div className="flex items-center gap-2">
       {/* Keeper Status */}
       <div className="relative group">
-        <Badge variant="outline" className="h-6 px-2 gap-1 border-emerald-500/30 text-emerald-500 text-xs cursor-help">
+        <Badge variant="outline" className="h-6 px-2 gap-1 border-long/30 text-long text-xs cursor-help">
           <Bot className="h-3 w-3" />
           Keeper
         </Badge>
@@ -88,19 +88,19 @@ function SystemStatusBadges() {
           <p className="font-medium mb-2">Keeper Service Active</p>
           <ul className="text-xs text-muted-foreground space-y-1">
             <li className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-long" />
               Oracle prices updating
             </li>
             <li className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-long" />
               Orders being filled
             </li>
             <li className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-long" />
               Liquidations monitored
             </li>
             <li className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-long" />
               Funding rates updating
             </li>
           </ul>
@@ -109,7 +109,7 @@ function SystemStatusBadges() {
 
       {/* Funding Status */}
       <div className="relative group">
-        <Badge variant="outline" className="h-6 px-2 gap-1 border-amber-500/30 text-amber-500 text-xs cursor-help">
+        <Badge variant="outline" className="h-6 px-2 gap-1 border-primary/30 text-primary text-xs cursor-help">
           <Zap className="h-3 w-3" />
           1h
         </Badge>

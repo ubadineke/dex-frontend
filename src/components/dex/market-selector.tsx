@@ -36,7 +36,7 @@ export function MarketSelector() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="h-auto py-2 px-3 flex items-center gap-3 min-w-[200px] justify-between"
+          className="h-auto py-2 px-3 flex items-center gap-3 w-full justify-between"
         >
           <div className="flex flex-col items-start">
             <span className="text-sm font-medium">
@@ -51,7 +51,7 @@ export function MarketSelector() {
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-[300px]">
+      <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)]">
         {markets.map((market) => {
           const info = market.info;
           const isSelected = info.marketIndex === selectedIndex;

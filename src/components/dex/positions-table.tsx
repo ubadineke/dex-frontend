@@ -105,7 +105,7 @@ export function PositionsTable() {
               const hasSL = position.stopLossPrice !== null;
 
               return (
-                <TableRow key={position.marketIndex} className={`position-row ${isSettled ? 'bg-emerald-500/5' : ''}`}>
+                <TableRow key={position.marketIndex} className={`position-row ${isSettled ? 'bg-long/5' : ''}`}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                       {position.marketName}
@@ -119,7 +119,7 @@ export function PositionsTable() {
                           }
                           side="right"
                         >
-                          <CheckCircle2 className="h-4 w-4 text-emerald-500 cursor-help" />
+                          <CheckCircle2 className="h-4 w-4 text-long cursor-help" />
                         </Tooltip>
                       )}
                     </div>
@@ -142,7 +142,7 @@ export function PositionsTable() {
                   </TableCell>
                   <TableCell className="text-right font-mono-numbers">
                     {isSettled ? (
-                      <span className="text-emerald-500">{formatPriceAsPercent(position.settlementPrice)}</span>
+                      <span className="text-long">{formatPriceAsPercent(position.settlementPrice)}</span>
                     ) : (
                       formatPriceAsPercent(position.markPrice)
                     )}
@@ -183,7 +183,7 @@ export function PositionsTable() {
                   </TableCell>
                   <TableCell className="text-right font-mono-numbers text-muted-foreground">
                     {isSettled ? (
-                      <span className="text-xs text-emerald-500">N/A</span>
+                      <span className="text-xs text-long">N/A</span>
                     ) : (
                       formatPriceAsPercent(position.liquidationPrice)
                     )}
@@ -193,7 +193,7 @@ export function PositionsTable() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-7 text-xs text-emerald-500 border-emerald-500/30 hover:bg-emerald-500/10"
+                        className="h-7 text-xs text-long border-long/30 hover:bg-long/10"
                         onClick={() => setSettlingPosition(position.marketIndex)}
                       >
                         <Banknote className="h-3 w-3 mr-1" />
@@ -298,7 +298,7 @@ export function PositionsTable() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              <CheckCircle2 className="h-5 w-5 text-long" />
               Settle Position
             </DialogTitle>
             <DialogDescription>
@@ -318,14 +318,14 @@ export function PositionsTable() {
 
                 return (
                   <div className="space-y-3">
-                    <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4 space-y-2">
+                    <div className="bg-long/10 border border-long/30 rounded-lg p-4 space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Market</span>
                         <span className="font-medium">{position.marketName}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Settlement Price</span>
-                        <span className="font-mono-numbers text-emerald-500 font-medium">
+                        <span className="font-mono-numbers text-long font-medium">
                           {formatPriceAsPercent(position.settlementPrice)}
                         </span>
                       </div>
@@ -370,7 +370,7 @@ export function PositionsTable() {
               Cancel
             </Button>
             <Button
-              className="bg-emerald-500 hover:bg-emerald-600 text-white"
+              className="bg-long hover:bg-long/90 text-primary-foreground"
               onClick={() =>
                 settlingPosition !== null && handleSettle(settlingPosition)
               }

@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Zap, User } from "lucide-react";
+import { Menu, X, User } from "lucide-react";
 import { ThemeSelect } from "@/components/theme-select";
 import { ClusterUiSelect } from "./cluster/cluster-ui";
 import { WalletButton } from "@/components/solana/solana-provider";
@@ -31,11 +31,9 @@ export function AppHeader({
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             href="/trade"
           >
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <Zap className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-lg font-bold tracking-tight">
-              Pred<span className="text-primary">Perp</span>
+            <img src="/logo.png" alt="Moxie" className="h-8 w-8" />
+            <span className="text-lg font-bold tracking-tight gradient-moxie-text">
+              Moxie
             </span>
           </Link>
 
@@ -77,7 +75,7 @@ export function AppHeader({
           {/* Account Button - Prominent on Trade page */}
           {isOnTradePage && (
             <Link href="/account">
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" className="h-9 gap-2">
                 <User className="h-4 w-4" />
                 Account
               </Button>
@@ -111,15 +109,17 @@ export function AppHeader({
               </ul>
               <div className="flex flex-col gap-3 pt-4 border-t border-border">
                 {/* Account Button in Mobile Menu */}
-                <Link href="/account" onClick={() => setShowMenu(false)}>
-                  <Button variant="outline" className="w-full gap-2">
+                <Link href="/account" onClick={() => setShowMenu(false)} className="w-full">
+                  <Button variant="outline" className="w-full h-10 gap-2">
                     <User className="h-4 w-4" />
                     Account
                   </Button>
                 </Link>
-                <WalletButton />
-                <div className="flex items-center gap-3">
-                  <ClusterUiSelect />
+                <div className="w-full [&_.wallet-adapter-button-trigger]:w-full [&_.wallet-adapter-button-trigger]:h-10">
+                  <WalletButton />
+                </div>
+                <div className="flex items-center gap-3 w-full">
+                  <ClusterUiSelect className="flex-1" />
                   <ThemeSelect />
                 </div>
               </div>

@@ -16,8 +16,12 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pred Perp DEX | Prediction Market Trading",
+  title: "Moxie | Prediction Market Trading",
   description: "Trade prediction markets with leverage on Solana",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 const links: { label: string; path: string }[] = [
