@@ -389,8 +389,8 @@ export function DiscoverFeature() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-            <Sparkles className="h-5 w-5 text-white" />
+          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center">
+            <Sparkles className="h-5 w-5 text-primary-foreground" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight">Discover Markets</h1>
         </div>
@@ -401,10 +401,10 @@ export function DiscoverFeature() {
 
       {/* Admin Badge */}
       {isAdmin && (
-        <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+        <div className="mb-6 p-4 rounded-lg bg-primary/10 border border-primary/20">
           <div className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-amber-500" />
-            <span className="font-medium text-amber-600 dark:text-amber-400">Admin Mode Active</span>
+            <CheckCircle className="h-5 w-5 text-primary" />
+            <span className="font-medium text-primary">Admin Mode Active</span>
             <span className="text-sm text-muted-foreground">— You can add markets to the DEX</span>
           </div>
         </div>
@@ -412,7 +412,7 @@ export function DiscoverFeature() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <Card className="bg-gradient-to-br from-violet-500/5 to-purple-500/5">
+        <Card className="bg-primary/5">
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
               <Globe className="h-4 w-4" />
@@ -422,17 +422,17 @@ export function DiscoverFeature() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-emerald-500/5 to-green-500/5">
+        <Card className="bg-long/5">
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
               <CheckCircle className="h-4 w-4" />
               Live on DEX
             </div>
-            <div className="text-2xl font-bold text-emerald-600">{stats.liveOnDex}</div>
+            <div className="text-2xl font-bold text-long">{stats.liveOnDex}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-500/5 to-cyan-500/5">
+        <Card className="bg-primary/5">
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
               <TrendingUp className="h-4 w-4" />
@@ -442,7 +442,7 @@ export function DiscoverFeature() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-amber-500/5 to-orange-500/5">
+        <Card className="bg-short/5">
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
               <DollarSign className="h-4 w-4" />
@@ -591,13 +591,13 @@ function MarketCard({ market, isAdmin, isAdding, onAdd }: MarketCardProps) {
 
   return (
     <Card
-      className={`transition-all hover:shadow-md ${market.isLiveOnDex ? 'border-emerald-500/30 bg-emerald-500/5' : ''}`}
+      className={`transition-all hover:shadow-md ${market.isLiveOnDex ? 'border-long/30 bg-long/5' : ''}`}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-base leading-tight line-clamp-2">{market.question}</CardTitle>
           {market.isLiveOnDex && (
-            <Badge variant="outline" className="shrink-0 border-emerald-500 text-emerald-600 bg-emerald-500/10">
+            <Badge variant="outline" className="shrink-0 border-long text-long bg-long/10">
               <CheckCircle className="h-3 w-3 mr-1" />
               Live
             </Badge>
@@ -618,11 +618,11 @@ function MarketCard({ market, isAdmin, isAdding, onAdd }: MarketCardProps) {
         {/* Price Bar */}
         <div className="mb-4">
           <div className="flex justify-between text-sm mb-1">
-            <span className="text-emerald-600 font-medium">YES {yesPct}%</span>
-            <span className="text-rose-600 font-medium">NO {noPct}%</span>
+            <span className="text-long font-medium">YES {yesPct}%</span>
+            <span className="text-short font-medium">NO {noPct}%</span>
           </div>
-          <div className="h-2 rounded-full bg-rose-200 dark:bg-rose-900/30 overflow-hidden">
-            <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${yesPct}%` }} />
+          <div className="h-2 rounded-full bg-short-muted overflow-hidden">
+            <div className="h-full bg-long rounded-full transition-all" style={{ width: `${yesPct}%` }} />
           </div>
         </div>
 

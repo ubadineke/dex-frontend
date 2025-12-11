@@ -260,7 +260,7 @@ export function OrdersTable() {
                       </span>
                     </div>
                     {isExitOrder && (
-                      <div className="mt-2 text-xs text-amber-500 bg-amber-500/10 p-2 rounded">
+                      <div className="mt-2 text-xs text-short bg-short/10 p-2 rounded">
                         Cancelling this will remove the {order.orderType === OrderType.TakeProfit ? 'take profit' : 'stop loss'} protection from your position.
                       </div>
                     )}

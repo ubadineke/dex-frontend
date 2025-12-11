@@ -53,16 +53,16 @@ export function ClusterChecker({ children }: { children: ReactNode }) {
   return children
 }
 
-export function ClusterUiSelect() {
+export function ClusterUiSelect({ className }: { className?: string }) {
   const { clusters, setCluster, cluster } = useCluster()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">{cluster.name}</Button>
+        <Button variant="outline" className={`h-9 capitalize ${className || ''}`}>{cluster.name}</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {clusters.map((item) => (
-          <DropdownMenuItem key={item.name} onClick={() => setCluster(item)}>
+          <DropdownMenuItem key={item.name} onClick={() => setCluster(item)} className="capitalize">
             {item.name}
           </DropdownMenuItem>
         ))}

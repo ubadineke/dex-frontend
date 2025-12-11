@@ -13,7 +13,7 @@ export async function GET(request: Request) {
       {
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'PredPerpDex/1.0',
+          'User-Agent': 'Moxie/1.0',
         },
         next: { revalidate: 60 }, // Cache for 60 seconds
       }

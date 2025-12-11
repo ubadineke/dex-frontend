@@ -88,10 +88,10 @@ export function MarketInfo() {
 
       {/* Settlement Banner (Day 3) */}
       {info.status === MarketStatus.Settled && (
-        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 mb-4">
+        <div className="bg-long/10 border border-long/30 rounded-lg p-3 mb-4">
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-            <span className="text-sm font-medium text-emerald-500">Market Settled</span>
+            <CheckCircle2 className="h-4 w-4 text-long" />
+            <span className="text-sm font-medium text-long">Market Settled</span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Settlement Price:</span>

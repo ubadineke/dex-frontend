@@ -145,7 +145,7 @@ export function AccountPanel() {
           {collateral?.marginUsed && !collateral.marginUsed.isZero() && (
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground">Margin Used</span>
-              <span className="font-mono-numbers text-amber-500">
+              <span className="font-mono-numbers text-primary">
                 {formatSol(collateral.marginUsed)} SOL
               </span>
             </div>
@@ -327,7 +327,7 @@ function WithdrawModal({ maxAmount, totalCollateral, onWithdraw, isPending }: Wi
               </span>
             </div>
             {maxAmount < totalCollateral && (
-              <p className="text-xs text-amber-500">
+              <p className="text-xs text-muted-foreground">
                 Some collateral is locked as margin for open positions.
               </p>
             )}
