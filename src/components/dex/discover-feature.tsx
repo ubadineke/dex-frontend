@@ -70,6 +70,7 @@ interface PolymarketMarket {
 }
 
 interface DiscoverMarket {
+  id: string // Polymarket market ID (for URL)
   conditionId: string
   question: string
   yesPrice: number
@@ -146,8 +147,10 @@ export function DiscoverFeature() {
   }, [marketsQuery.data])
 
   // Fetch Polymarket events
+  // Include existingConditionIds in key so it refetches when DEX markets change
+  const existingIdsKey = Array.from(existingConditionIds).sort().join(',')
   const polymarketsQuery = useQuery({
-    queryKey: ['polymarket', 'events', loadedCount],
+    queryKey: ['polymarket', 'events', loadedCount, existingIdsKey],
     queryFn: async () => {
       const events = await fetchPolymarketEvents(0, loadedCount)
 
@@ -212,6 +215,7 @@ export function DiscoverFeature() {
             : undefined
 
           markets.push({
+            id: market.id, // Polymarket market ID for URL
             conditionId: market.conditionId,
             question: market.question || event.title,
             yesPrice,
@@ -288,6 +292,16 @@ export function DiscoverFeature() {
       const name = stringToBytes32(market.question.slice(0, 31))
       const polymarketId = stringToBytes64(market.conditionId)
 
+      // Derive Polymarket Marker PDA - this prevents duplicate markets
+      // Use first 32 bytes of polymarket_id (max seed length for Solana PDAs)
+      const POLYMARKET_MARKER_SEED = Buffer.from('polymarket_marker')
+      const polymarketIdBuffer = Buffer.from(polymarketId)
+      const seedBytes = polymarketIdBuffer.slice(0, 32)
+      const [polymarketMarkerPda] = PublicKey.findProgramAddressSync(
+        [POLYMARKET_MARKER_SEED, seedBytes],
+        program.programId
+      )
+
       // Calculate initial price (scaled to PRICE_PRECISION)
       // Price is already validated to be in 0.05-0.95 range during discovery
       const initialPrice = new BN(Math.floor(market.yesPrice * PRICE_PRECISION))
@@ -308,13 +322,16 @@ export function DiscoverFeature() {
         initialLiquidity,
       }
 
-      // Call addMarket - oracle is a PDA, no signer needed
+      // Call addMarket - oracle and marker are PDAs, no signer needed
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const accounts: any = {
+        admin: wallet.publicKey,
+        oracle: oraclePda,
+        polymarketMarker: polymarketMarkerPda,
+      }
       const signature = await program.methods
         .addMarket(params as never)
-        .accounts({
-          admin: wallet.publicKey,
-          oracle: oraclePda,
-        })
+        .accounts(accounts)
         .rpc()
 
       return { signature, marketQuestion: market.question }
@@ -328,12 +345,23 @@ export function DiscoverFeature() {
     },
     onError: (error: Error) => {
       console.error('[AddMarket] Failed:', error)
-      toast.error(`Failed to add market: ${error.message}`)
+      // Check for duplicate market error (account already exists)
+      const errorMsg = error.message
+      if (errorMsg.includes('already in use') || errorMsg.includes('already been processed')) {
+        toast.error('This market already exists on the DEX!')
+      } else {
+        toast.error(`Failed to add market: ${errorMsg}`)
+      }
       setAddingMarket(null)
     },
   })
 
   const handleAddMarket = (market: DiscoverMarket) => {
+    // Prevent adding duplicate markets
+    if (existingConditionIds.has(market.conditionId)) {
+      toast.error('This market is already on the DEX!')
+      return
+    }
     setAddingMarket(market.conditionId)
     addMarketMutation.mutate(market)
   }
@@ -617,16 +645,16 @@ function MarketCard({ market, isAdmin, isAdding, onAdd }: MarketCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="pt-0 gap-2">
+      <CardFooter className="pt-0 flex gap-2">
         {market.isLiveOnDex ? (
-          <Button variant="outline" className="w-full" asChild>
+          <Button variant="outline" className="flex-1" asChild>
             <a href={`/trade?market=${market.dexMarketIndex}`}>
               Trade on DEX
               <ExternalLink className="h-4 w-4 ml-2" />
             </a>
           </Button>
         ) : isAdmin ? (
-          <Button className="w-full" onClick={onAdd} disabled={isAdding}>
+          <Button className="flex-1" onClick={onAdd} disabled={isAdding}>
             {isAdding ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -640,14 +668,14 @@ function MarketCard({ market, isAdmin, isAdding, onAdd }: MarketCardProps) {
             )}
           </Button>
         ) : (
-          <Button variant="outline" className="w-full" disabled>
+          <Button variant="outline" className="flex-1" disabled>
             <span className="text-muted-foreground">Admin Only</span>
           </Button>
         )}
 
-        <Button variant="ghost" size="icon" asChild>
+        <Button variant="ghost" size="icon" className="shrink-0" asChild>
           <a
-            href={`https://polymarket.com/event/${market.slug}`}
+            href={`https://polymarket.com/event/${market.slug}?tid=${market.id}`}
             target="_blank"
             rel="noopener noreferrer"
             title="View on Polymarket"

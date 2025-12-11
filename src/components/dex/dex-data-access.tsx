@@ -17,7 +17,7 @@ import { atom, useAtom } from 'jotai'
 
 import predPerpDexIDL from '@/idl/pred_perp_dex.json'
 import { PredPerpDex } from '@/idl/pred_perp_dex'
-import { PROGRAM_ID, STATE_SEED, USER_SEED, MARKET_SEED, COLLATERAL_VAULT_SEED, PRICE_PRECISION } from '@/lib/constants'
+import { PROGRAM_ID, STATE_SEED, USER_SEED, MARKET_SEED, COLLATERAL_VAULT_SEED, PRICE_PRECISION, BASE_PRECISION, MARGIN_PRECISION, DEFAULT_MAINTENANCE_MARGIN_RATIO, MAX_PREDICTION_PRICE } from '@/lib/constants'
 import { bytesToString } from '@/lib/format'
 import { useAnchorProvider } from '../solana/solana-provider'
 import { useTransactionToast } from '../use-transaction-toast'
@@ -587,41 +587,54 @@ export function useUserPositions() {
       marketIndex: number
       baseAssetAmount: BN
       quoteEntryAmount: BN
-      liquidationPrice?: BN
       lastCumulativeFundingRate?: BN
     }
     interface UserOrder {
       orderId: number
       marketIndex: number
       orderType: Record<string, unknown>
-      price: BN
-      triggerPrice: BN
+      price: unknown
+      triggerPrice: unknown
       status: Record<string, unknown>
       reduceOnly: boolean
     }
-    const userData = userQuery.data as unknown as { positions?: UserPosition[]; orders?: UserOrder[] }
+    const userData = userQuery.data as unknown as { 
+      positions?: UserPosition[]
+      orders?: UserOrder[]
+      collateral?: unknown 
+    }
     const userPositions = userData?.positions || []
     const userOrders = userData?.orders || []
+    const userCollateral = toBN(userData?.collateral)
 
     return userPositions
       .filter((p) => {
-        return !p.baseAssetAmount.isZero()
+        return !toBN(p.baseAssetAmount).isZero()
       })
       .map((p) => {
         const market = marketsQuery.data?.find((m) => m.info.marketIndex === p.marketIndex)
-        const baseAmount = p.baseAssetAmount
-        const quoteEntry = p.quoteEntryAmount
-        const marketAccount = market?.account as { oraclePrice?: BN } | undefined
-        const oraclePrice = marketAccount?.oraclePrice ? new BN(marketAccount.oraclePrice.toString()) : new BN(0)
+        const baseAmount = toBN(p.baseAssetAmount)
+        const quoteEntry = toBN(p.quoteEntryAmount)
+        const marketAccount = market?.account as { oraclePrice?: unknown; marginRatioMaintenance?: number } | undefined
+        const oraclePrice = toBN(marketAccount?.oraclePrice)
+        const marginRatioMaintenance = marketAccount?.marginRatioMaintenance || DEFAULT_MAINTENANCE_MARGIN_RATIO
 
         const direction = baseAmount.isNeg() ? PositionDirection.Short : PositionDirection.Long
         const size = baseAmount.abs()
-        const entryPrice = quoteEntry.isZero() ? new BN(0) : quoteEntry.mul(new BN(PRICE_PRECISION)).div(size)
+        const entryPrice = quoteEntry.isZero() ? new BN(0) : quoteEntry.abs().mul(new BN(BASE_PRECISION)).div(size)
 
         // Calculate unrealized PnL
         const currentValue = size.mul(oraclePrice).div(new BN(PRICE_PRECISION))
         const entryValue = quoteEntry.abs()
         const unrealizedPnl = baseAmount.isNeg() ? entryValue.sub(currentValue) : currentValue.sub(entryValue)
+
+        // Calculate liquidation price (client-side calculation)
+        const liquidationPrice = calculateLiquidationPrice(
+          baseAmount,
+          quoteEntry,
+          userCollateral,
+          marginRatioMaintenance
+        )
 
         // Day 3: Market settlement status
         const marketStatus = market?.info.status || MarketStatus.Active
@@ -648,18 +661,18 @@ export function useUserPositions() {
           entryPrice,
           markPrice: oraclePrice,
           unrealizedPnl,
-          liquidationPrice: new BN(p.liquidationPrice || 0),
+          liquidationPrice,
           // Day 3 fields
           marketStatus,
           isMarketSettled,
           settlementPrice,
           lastCumulativeFundingRate: p.lastCumulativeFundingRate
-            ? new BN(p.lastCumulativeFundingRate.toString())
+            ? toBN(p.lastCumulativeFundingRate)
             : new BN(0),
-          // Attached TP/SL
-          takeProfitPrice: tpOrder ? new BN(tpOrder.triggerPrice.toString()) : null,
+          // Attached TP/SL - use toBN to safely convert trigger prices
+          takeProfitPrice: tpOrder ? toBN(tpOrder.triggerPrice) : null,
           takeProfitOrderId: tpOrder?.orderId ?? null,
-          stopLossPrice: slOrder ? new BN(slOrder.triggerPrice.toString()) : null,
+          stopLossPrice: slOrder ? toBN(slOrder.triggerPrice) : null,
           stopLossOrderId: slOrder?.orderId ?? null,
         }
       })
@@ -685,8 +698,9 @@ export function useUserOrders() {
       marketIndex: number
       direction: { long?: object; short?: object }
       orderType: Record<string, unknown>
-      baseAssetAmount: BN
-      price: BN
+      baseAssetAmount: unknown
+      price: unknown
+      triggerPrice: unknown
       status: Record<string, unknown>
     }
     const userData = userQuery.data as unknown as { orders?: UserOrder[] }
@@ -698,14 +712,19 @@ export function useUserOrders() {
       })
       .map((o) => {
         const market = marketsQuery.data?.find((m) => m.info.marketIndex === o.marketIndex)
+        const orderType = parseOrderType(o.orderType)
+        // For TP/SL orders, use triggerPrice. For limit/market orders, use price.
+        const isExitOrder = orderType === OrderType.TakeProfit || orderType === OrderType.StopLoss
+        const displayPrice = isExitOrder ? toBN(o.triggerPrice) : toBN(o.price)
+        
         return {
           orderId: o.orderId,
           marketIndex: o.marketIndex,
           marketName: market?.info.name || `Market ${o.marketIndex}`,
           direction: o.direction.long ? PositionDirection.Long : PositionDirection.Short,
-          orderType: parseOrderType(o.orderType),
-          size: o.baseAssetAmount,
-          price: o.price,
+          orderType,
+          size: toBN(o.baseAssetAmount),
+          price: displayPrice,
           status: parseOrderStatus(o.status),
         }
       })
@@ -862,6 +881,71 @@ function parseOrderType(orderType: Record<string, unknown>): OrderType {
   if (orderType.stopLoss) return OrderType.StopLoss
   if (orderType.takeProfit) return OrderType.TakeProfit
   return OrderType.Market
+}
+
+// ============ MARGIN CALCULATION HELPERS ============
+
+/**
+ * Calculate entry price from quote and base amounts
+ */
+function calculateEntryPrice(quoteEntryAmount: BN, baseAssetAmount: BN): BN {
+  if (baseAssetAmount.isZero()) return new BN(0)
+  return quoteEntryAmount.abs().mul(new BN(BASE_PRECISION)).div(baseAssetAmount.abs())
+}
+
+/**
+ * Calculate margin requirement for a position value
+ */
+function calculateMarginRequirement(positionValue: BN, marginRatio: number): BN {
+  return positionValue.mul(new BN(marginRatio)).div(new BN(MARGIN_PRECISION))
+}
+
+/**
+ * Calculate liquidation price for a position
+ */
+function calculateLiquidationPrice(
+  baseAssetAmount: BN,
+  quoteEntryAmount: BN,
+  collateral: BN,
+  marginRatioMaintenance: number = DEFAULT_MAINTENANCE_MARGIN_RATIO
+): BN {
+  if (baseAssetAmount.isZero()) {
+    return new BN(0)
+  }
+
+  const entryPrice = calculateEntryPrice(quoteEntryAmount, baseAssetAmount)
+  const baseAbs = baseAssetAmount.abs()
+  const positionValue = baseAbs.mul(entryPrice).div(new BN(BASE_PRECISION))
+  const maintenanceMargin = calculateMarginRequirement(positionValue, marginRatioMaintenance)
+
+  // Buffer = collateral - maintenance_margin
+  const buffer = collateral.gt(maintenanceMargin) ? collateral.sub(maintenanceMargin) : new BN(0)
+
+  // Price buffer = buffer * BASE_PRECISION / base_abs
+  const priceBuffer = buffer.mul(new BN(BASE_PRECISION)).div(baseAbs)
+
+  if (baseAssetAmount.gt(new BN(0))) {
+    // Long: liquidate when price drops
+    return entryPrice.gt(priceBuffer) ? entryPrice.sub(priceBuffer) : new BN(0)
+  } else {
+    // Short: liquidate when price rises
+    const liqPrice = entryPrice.add(priceBuffer)
+    return liqPrice.gt(new BN(MAX_PREDICTION_PRICE)) ? new BN(MAX_PREDICTION_PRICE) : liqPrice
+  }
+}
+
+/**
+ * Safely convert a value to BN, handling various input types
+ */
+function toBN(value: unknown): BN {
+  if (value === null || value === undefined) return new BN(0)
+  if (BN.isBN(value)) return value
+  if (typeof value === 'number') return new BN(value)
+  if (typeof value === 'string') return new BN(value)
+  if (typeof value === 'object' && 'toString' in (value as object)) {
+    return new BN((value as { toString: () => string }).toString())
+  }
+  return new BN(0)
 }
 
 type AnchorOrderType =

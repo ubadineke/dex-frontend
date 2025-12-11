@@ -74,6 +74,15 @@
           "name": "oracle"
         },
         {
+          "name": "polymarket_marker",
+          "docs": [
+            "Polymarket ID marker - prevents duplicate markets",
+            "If this account already exists, the transaction will fail",
+            "Uses first 32 bytes of polymarket_id as seed (condition IDs are typically shorter)"
+          ],
+          "writable": true
+        },
+        {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
@@ -1377,206 +1386,211 @@
     },
     {
       "code": 6014,
+      "name": "DuplicateMarket",
+      "msg": "Market with this Polymarket ID already exists"
+    },
+    {
+      "code": 6015,
       "name": "UserAlreadyInitialized",
       "msg": "User account already initialized"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "UserNotInitialized",
       "msg": "User not initialized"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "InsufficientCollateral",
       "msg": "Insufficient collateral"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "CollateralBelowMinimum",
       "msg": "Collateral below minimum"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "WithdrawalExceedsFreeCollateral",
       "msg": "Withdrawal exceeds free collateral"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "UserBeingLiquidated",
       "msg": "User is being liquidated"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "UserBankrupt",
       "msg": "User is bankrupt"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "PositionNotFound",
       "msg": "Position not found"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "MaxPositionsReached",
       "msg": "Max positions reached"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "InvalidPositionDirection",
       "msg": "Invalid position direction"
     },
     {
-      "code": 6024,
+      "code": 6025,
       "name": "PositionStillOpen",
       "msg": "Position still open"
     },
     {
-      "code": 6025,
+      "code": 6026,
       "name": "InvalidOrderType",
       "msg": "Invalid order type"
     },
     {
-      "code": 6026,
+      "code": 6027,
       "name": "InvalidOrderDirection",
       "msg": "Invalid order direction"
     },
     {
-      "code": 6027,
+      "code": 6028,
       "name": "OrderNotFound",
       "msg": "Order not found"
     },
     {
-      "code": 6028,
+      "code": 6029,
       "name": "MaxOrdersReached",
       "msg": "Max orders reached"
     },
     {
-      "code": 6029,
+      "code": 6030,
       "name": "OrderAlreadyFilled",
       "msg": "Order already filled"
     },
     {
-      "code": 6030,
+      "code": 6031,
       "name": "OrderAlreadyCancelled",
       "msg": "Order already cancelled"
     },
     {
-      "code": 6031,
+      "code": 6032,
       "name": "OrderExpired",
       "msg": "Order expired"
     },
     {
-      "code": 6032,
+      "code": 6033,
       "name": "OrderSizeTooSmall",
       "msg": "Order size too small"
     },
     {
-      "code": 6033,
+      "code": 6034,
       "name": "OrderPriceOutsideBounds",
       "msg": "Order price outside bounds"
     },
     {
-      "code": 6034,
+      "code": 6035,
       "name": "OrderExceedsMaxLeverage",
       "msg": "Order would exceed max leverage"
     },
     {
-      "code": 6035,
+      "code": 6036,
       "name": "ReduceOnlyOrderIncreasesPosition",
       "msg": "Reduce only order would increase position"
     },
     {
-      "code": 6036,
+      "code": 6037,
       "name": "InsufficientAmmLiquidity",
       "msg": "Insufficient AMM liquidity"
     },
     {
-      "code": 6037,
+      "code": 6038,
       "name": "TradeSizeTooLarge",
       "msg": "Trade size too large for AMM"
     },
     {
-      "code": 6038,
+      "code": 6039,
       "name": "PriceBoundsExceeded",
       "msg": "Price bounds exceeded"
     },
     {
-      "code": 6039,
+      "code": 6040,
       "name": "InvalidAmmReserves",
       "msg": "Invalid AMM reserves"
     },
     {
-      "code": 6040,
+      "code": 6041,
       "name": "SlippageToleranceExceeded",
       "msg": "Slippage tolerance exceeded"
     },
     {
-      "code": 6041,
+      "code": 6042,
       "name": "InvalidOracle",
       "msg": "Invalid oracle"
     },
     {
-      "code": 6042,
+      "code": 6043,
       "name": "OraclePriceStale",
       "msg": "Oracle price stale"
     },
     {
-      "code": 6043,
+      "code": 6044,
       "name": "OraclePriceInvalid",
       "msg": "Oracle price invalid"
     },
     {
-      "code": 6044,
+      "code": 6045,
       "name": "OracleConfidenceTooWide",
       "msg": "Oracle confidence too wide"
     },
     {
-      "code": 6045,
+      "code": 6046,
       "name": "InsufficientMargin",
       "msg": "Insufficient margin"
     },
     {
-      "code": 6046,
+      "code": 6047,
       "name": "LeverageExceedsMax",
       "msg": "Leverage exceeds maximum"
     },
     {
-      "code": 6047,
+      "code": 6048,
       "name": "SufficientCollateral",
       "msg": "User has sufficient collateral"
     },
     {
-      "code": 6048,
+      "code": 6049,
       "name": "LiquidationNotRequired",
       "msg": "Liquidation not required"
     },
     {
-      "code": 6049,
+      "code": 6050,
       "name": "InvalidLiquidationAmount",
       "msg": "Invalid liquidation amount"
     },
     {
-      "code": 6050,
+      "code": 6051,
       "name": "FundingNotReady",
       "msg": "Funding not ready"
     },
     {
-      "code": 6051,
+      "code": 6052,
       "name": "InvalidFundingPeriod",
       "msg": "Invalid funding period"
     },
     {
-      "code": 6052,
+      "code": 6053,
       "name": "MarketNotExpired",
       "msg": "Market not expired"
     },
     {
-      "code": 6053,
+      "code": 6054,
       "name": "InvalidSettlementPrice",
       "msg": "Invalid settlement price"
     },
     {
-      "code": 6054,
+      "code": 6055,
       "name": "PositionNotSettled",
       "msg": "Position not settled"
     }
